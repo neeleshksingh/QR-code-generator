@@ -70,16 +70,27 @@ app.post("/api/qr/create", async (req, res) => {
 
 app.get("/q/:code", async (req, res) => {
   try {
+    console.log("➡️ Hit /q/:code", req.params.code);
+
     await connectDB();
+    console.log("✅ DB connected");
 
     const qr = await QR.findOne({ code: req.params.code });
-    if (!qr) return res.status(404).send("Invalid QR");
-    res.redirect(qr.redirectUrl);
+    console.log("🔍 QR found:", qr);
+
+    if (!qr) {
+      return res.status(404).send("Invalid QR");
+    }
+
+    return res.redirect(qr.redirectUrl);
+
   } catch (err) {
-    console.error(err);
-    res.status(500).send("Server error");
+    console.error("❌ Redirect error FULL:", err);
+    return res.status(500).send("Server error");
   }
 });
+
+
 
 // 404 handler - must be AFTER all routes
 app.use((req, res) => res.status(404).send('API not found'));
@@ -92,9 +103,6 @@ if (process.env.NODE_ENV !== 'production') {
     });
   });
 }
-
-// Export for Vercel serverless
-module.exports = app;
 
 // Export for Vercel serverless
 module.exports = app;
