@@ -43,8 +43,6 @@ const QR = mongoose.model("QR", qrSchema);
 
 app.get('/', (req, res) => res.status(200).send('Backend OK'));
 
-app.use((req, res) => res.status(404).send('API not found'));
-
 app.post("/api/qr/create", async (req, res) => {
   try {
     const { redirectUrl } = req.body;
@@ -70,6 +68,15 @@ app.get("/q/:code", async (req, res) => {
   res.redirect(qr.redirectUrl);
 });
 
-app.listen(5000, () => {
-  console.log("Backend running on port 5000");
-});
+// 404 handler - must be AFTER all routes
+app.use((req, res) => res.status(404).send('API not found'));
+
+// For local development
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(5000, () => {
+    console.log("Backend running on port 5000");
+  });
+}
+
+// Export for Vercel serverless
+module.exports = app;
