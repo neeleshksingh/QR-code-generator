@@ -17,9 +17,7 @@ async function startServer() {
     await mongoose.connect(process.env.MONGO_URI);
     console.log("Connected to MongoDB ✅");
 
-    app.listen(5000, () => {
-      console.log("Backend running on port 5000");
-    });
+
   } catch (error) {
     console.error("MongoDB connection failed ❌", error);
     process.exit(1);
@@ -43,9 +41,9 @@ const QR = mongoose.model("QR", qrSchema);
 // Routes
 // =====================
 
-app.get("/", (req, res) => {
-  res.send("QR Code Generator API is running");
-});
+app.get('/', (req, res) => res.status(200).send('Backend OK'));
+
+app.use((req, res) => res.status(404).send('API not found'));
 
 app.post("/api/qr/create", async (req, res) => {
   try {
@@ -70,4 +68,8 @@ app.get("/q/:code", async (req, res) => {
   const qr = await QR.findOne({ code: req.params.code });
   if (!qr) return res.status(404).send("Invalid QR");
   res.redirect(qr.redirectUrl);
+});
+
+app.listen(5000, () => {
+  console.log("Backend running on port 5000");
 });
