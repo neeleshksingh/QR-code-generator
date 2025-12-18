@@ -42,6 +42,11 @@ const QR = mongoose.model("QR", qrSchema);
 // =====================
 // Routes
 // =====================
+
+app.get("/", (req, res) => {
+  res.send("QR Code Generator API is running");
+});
+
 app.post("/api/qr/create", async (req, res) => {
   try {
     const { redirectUrl } = req.body;
