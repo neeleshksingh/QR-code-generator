@@ -70,27 +70,20 @@ app.post("/api/qr/create", async (req, res) => {
 
 app.get("/q/:code", async (req, res) => {
   try {
-    console.log("➡️ Hit /q/:code", req.params.code);
-
     await connectDB();
-    console.log("✅ DB connected");
 
-    const qr = await QR.findOne({ code: req.params.code });
-    console.log("🔍 QR found:", qr);
-
+    const qr = await QR.findOne({ code: req.params.code }).lean();
     if (!qr) {
       return res.status(404).send("Invalid QR");
     }
 
-    return res.redirect(qr.redirectUrl);
+    return res.redirect(302, qr.redirectUrl);
 
   } catch (err) {
-    console.error("❌ Redirect error FULL:", err);
+    console.error("QR redirect failed:", err);
     return res.status(500).send("Server error");
   }
 });
-
-
 
 // 404 handler - must be AFTER all routes
 app.use((req, res) => res.status(404).send('API not found'));
